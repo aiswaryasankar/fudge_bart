@@ -2137,12 +2137,17 @@ class Trainer:
 
         batch_size = dataloader.batch_size
 
-        logger.info(f"***** Running {description} *****")
-        if isinstance(dataloader.dataset, collections.abc.Sized):
-            logger.info(f"  Num examples = {self.num_examples(dataloader)}")
-        else:
-            logger.info("  Num examples: Unknown")
-        logger.info(f"  Batch size = {batch_size}")
+        for step, inputs in enumerate(dataloader):
+            print(step)
+            print(inputs)
+
+        logger.ino(f"CHECKING THAT THIS IS RUNNING MY CODE")
+        #logger.info(f"***** Running {description} *****")
+        #if isinstance(dataloader.dataset, collections.abc.Sized):
+        #    logger.info(f"  Num examples = {self.num_examples(dataloader)}")
+        #else:
+        #    logger.info("  Num examples: Unknown")
+        #logger.info(f"  Batch size = {batch_size}")
 
         model.eval()
 
@@ -2175,8 +2180,17 @@ class Trainer:
             if observed_batch_size is not None:
                 observed_num_examples += observed_batch_size
 
+            
+            logger.info("INPUTS TO MODEL")
+            logger.info(inputs)
             # Prediction step
             loss, logits, labels = self.prediction_step(model, inputs, prediction_loss_only, ignore_keys=ignore_keys)
+            logger.info("LOSS")
+            logger.info(loss)
+            logger.info("LOGITS")
+            logger.info(logits)
+            logger.info("LABELS")
+            logger.info(labels)
 
             # Update containers on host
             if loss is not None:

@@ -24,20 +24,31 @@ import sys
 from dataclasses import dataclass, field
 from typing import Optional
 
+#import os
+#import sys
+#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import nltk  # Here to have a nice missing dependency error message early on
 import numpy as np
 from datasets import load_dataset, load_metric
+import torch
 
-import transformers
+# import transformers
 from filelock import FileLock
+#from ..src import transformers 
+import importlib
+import mytransformers
+importlib.reload(mytransformers)
+
+from mytransformers import Seq2SeqTrainer, Seq2SeqTrainingArguments
 from transformers import (
     AutoConfig,
     AutoModelForSeq2SeqLM,
     AutoTokenizer,
     DataCollatorForSeq2Seq,
     HfArgumentParser,
-    Seq2SeqTrainer,
-    Seq2SeqTrainingArguments,
+    #Seq2SeqTrainer,
+    #Seq2SeqTrainingArguments,
     set_seed,
 )
 from transformers.file_utils import is_offline_mode
@@ -46,7 +57,7 @@ from transformers.utils import check_min_version
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-check_min_version("4.7.0.dev0")
+# check_min_version("4.7.0.dev0")
 
 logger = logging.getLogger(__name__)
 
@@ -235,7 +246,9 @@ summarization_name_mapping = {
     "xglue": ("news_body", "news_title"),
     "xsum": ("document", "summary"),
     "wiki_summary": ("article", "highlights"),
+    "multi_news" : ("document", "summary"),
 }
+
 
 
 def main():
@@ -251,13 +264,24 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
+    print("DATA ARGS")
+    print(data_args)
+
+    print("MODEL ARGS")
+    print(model_args)
+
+    print("TRAINING ARGS")
+    print(training_args)
+
+
     if data_args.source_prefix is None and model_args.model_name_or_path in [
         "t5-small",
         "t5-base",
         "t5-large",
         "t5-3b",
         "t5-11b",
-    ]:
+        "facebook/bart-base",
+        ]:
         logger.warning(
             "You're running a t5 model but didn't provide a source prefix, which is the expected, e.g. with "
             "`--source_prefix 'summarize: ' `"
@@ -293,7 +317,7 @@ def main():
     )
     # Set the verbosity to info of the Transformers logger (on main process only):
     if training_args.should_log:
-        transformers.utils.logging.set_verbosity_info()
+        mytransformers.utils.logging.set_verbosity_info()
     logger.info(f"Training/evaluation parameters {training_args}")
 
     # Set seed before initializing model.
@@ -337,6 +361,7 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+    
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
@@ -344,6 +369,11 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+
+    #model = AutoModelForSeq2SeqLM.from_pretrained(pretrained_model_name_or_path=model_args.model_name_or_path)
+    #model.load_state_dict(torch.load(model_args.model_name_or_path))
+    #model.eval()
+
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -510,6 +540,7 @@ def main():
         return result
 
     # Initialize our Trainer
+    logger.info("initializing seq2seq trainer") 
     trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
@@ -544,7 +575,7 @@ def main():
     results = {}
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
-
+        logger.info("EVAL")
         metrics = trainer.evaluate(
             max_length=data_args.val_max_target_length, num_beams=data_args.num_beams, metric_key_prefix="eval"
         )
