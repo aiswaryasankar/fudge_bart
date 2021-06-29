@@ -28,7 +28,7 @@ from typing import Optional
 #import sys
 #sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import nltk  # Here to have a nice missing dependency error message early on
+# import nltk  # Here to have a nice missing dependency error message early on
 import numpy as np
 from datasets import load_dataset, load_metric
 import torch

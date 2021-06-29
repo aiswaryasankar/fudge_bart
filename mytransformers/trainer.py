@@ -73,11 +73,11 @@ from .file_utils import (
     is_torch_tpu_available,
     is_training_run_on_sagemaker,
 )
-from .modelcard import TrainingSummary
-from .modeling_utils import PreTrainedModel, unwrap_model
-from .optimization import Adafactor, AdamW, get_scheduler
-from .tokenization_utils_base import PreTrainedTokenizerBase
-from .trainer_callback import (
+from mytransformers1.modelcard import TrainingSummary
+from mytransformers1.modeling_utils import PreTrainedModel, unwrap_model
+from mytransformers1.optimization import Adafactor, AdamW, get_scheduler
+from mytransformers1.tokenization_utils_base import PreTrainedTokenizerBase
+from mytransformers1.trainer_callback import (
     CallbackHandler,
     DefaultFlowCallback,
     PrinterCallback,
@@ -86,7 +86,7 @@ from .trainer_callback import (
     TrainerControl,
     TrainerState,
 )
-from .trainer_pt_utils import (
+from mytransformers1.trainer_pt_utils import (
     DistributedLengthGroupedSampler,
     DistributedSamplerWithLoop,
     DistributedTensorGatherer,
@@ -2137,11 +2137,9 @@ class Trainer:
 
         batch_size = dataloader.batch_size
 
-        #for step, inputs in enumerate(dataloader):
-        #    print(step)
-        #    print(inputs)
+        print("IIIIIIIIIIIIIIIIII")
+        logger.info("RNAOMD LOGING TO CHECK POINT")
 
-        #logger.info(f"CHECKING THAT THIS IS RUNNING MY CODE")
         logger.info(f"***** Running {description} *****")
         if isinstance(dataloader.dataset, collections.abc.Sized):
             logger.info(f"  Num examples = {self.num_examples(dataloader)}")

@@ -21,11 +21,11 @@ from packaging import version
 from torch import nn
 from torch.utils.data.dataset import Dataset
 
-import mytransformers
-from mytransformers.deepspeed import is_deepspeed_zero3_enabled
-from .trainer import Trainer
-from .trainer_utils import PredictionOutput
-from .utils import logging
+import mytransformers1
+from mytransformers1.deepspeed import is_deepspeed_zero3_enabled
+from mytransformers1.trainer import Trainer
+from mytransformers1.trainer_utils import PredictionOutput
+from mytransformers1.utils import logging
 
 
 if version.parse(torch.__version__) >= version.parse("1.6"):
